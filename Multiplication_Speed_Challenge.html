@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Multiplication Speed Challenge</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:800px;margin:20px auto;padding:20px}
+input,button{padding:8px;margin:5px}
+.question{margin:10px 0;font-size:20px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<h1>Multiplication Speed Challenge</h1>
+
+<div id="start">
+<label>Student Name:</label>
+<input id="name" type="text" required>
+<button onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<div id="quiz" class="hidden">
+<p>Time: <span id="timer">0.0</span> seconds</p>
+<div id="questions"></div>
+<button onclick="submitQuiz()">Submit</button>
+</div>
+
+<div id="result" class="hidden"></div>
+
+<script>
+let startTime;
+let timerInterval;
+let answers=[];
+
+function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min;}
+
+function startQuiz(){
+ const name=document.getElementById('name').value.trim();
+ if(!name){alert('Enter your name');return;}
+ document.getElementById('start').classList.add('hidden');
+ document.getElementById('quiz').classList.remove('hidden');
+
+ const qDiv=document.getElementById('questions');
+ qDiv.innerHTML='';
+ answers=[];
+
+ for(let i=1;i<=30;i++){
+   let a=rand(2,12), b=rand(2,12);
+   answers.push({a,b});
+   qDiv.innerHTML += `<div class="question">${i}. ${a} × ${b} = <input type="number" id="q${i}"></div>`;
+ }
+
+ startTime=Date.now();
+ timerInterval=setInterval(()=>{
+   document.getElementById('timer').innerText=((Date.now()-startTime)/1000).toFixed(1);
+ },100);
+}
+
+function submitQuiz(){
+ clearInterval(timerInterval);
+
+ let score=0;
+ for(let i=1;i<=30;i++){
+   const val=parseInt(document.getElementById('q'+i).value);
+   if(val===answers[i-1].a*answers[i-1].b) score++;
+ }
+
+ const elapsed=((Date.now()-startTime)/1000).toFixed(1);
+ const name=document.getElementById('name').value;
+
+ document.getElementById('quiz').classList.add('hidden');
+ document.getElementById('result').classList.remove('hidden');
+ document.getElementById('result').innerHTML =
+ `<h2>Result</h2>
+  <p>Name: ${name}</p>
+  <p>Score: ${score}/30</p>
+  <p>Time: ${elapsed} seconds</p>
+  <p>Take a screenshot and send it to your teacher.</p>`;
+
+ // OPTIONAL:
+ // Replace YOUR_WEBAPP_URL with a Google Apps Script URL to collect results automatically.
+ /*
+ fetch("YOUR_WEBAPP_URL",{
+   method:"POST",
+   mode:"no-cors",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({name,score,time:elapsed,date:new Date().toISOString()})
+ });
+ */
+}
+</script>
+</body>
+</html>
